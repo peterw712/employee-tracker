@@ -2,6 +2,7 @@ DROP DATABASE IF EXISTS tracker_db;
 CREATE DATABASE tracker_db;
 USE tracker_db;
 
+
 CREATE TABLE department (
     id INT AUTO_INCREMENT NOT NULL, 
     name VARCHAR(30) NOT NULL,
