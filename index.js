@@ -1,4 +1,5 @@
 let mysql = require("mysql2");
+let inquirer = require("inquirer");
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -29,9 +30,33 @@ function role() {
     })
 };
 
-console.log(employee());
-console.log(department());
-console.log(role());
+function view() {
+    inquirer.prompt([
+        {
+            name: "choiceView",
+            type: "list",
+            message: "What would you like to view?",
+            choices: ["All Departments", "All Roles", "All Employees"]
+        }]).then(function (response) {
+            switch (response.choiceView) {
+
+                case "All Departments":
+                    department();
+                    break;
+                case "All Roles":
+                    role();
+                    break;
+                case "All Employees":
+                    employee();
+                    break;
+                default: console.log("Please enter appropriate choice.")
+
+            }
+        })
+};
+
+console.log(view());
+
 
 
 
