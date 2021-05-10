@@ -55,28 +55,7 @@ function view() {
         })
 };
 
-function add() {
-    inquirer.prompt([
-        {
-            name: "departmentRoleEmployee",
-            type: "list",
-            message: "What would you like to add?",
-            choices: ["Employee", "Role", "Department"]
-        }])
-        .then((response) => {
-            switch (response.departmentRoleEmployee) {
-                case "Department":
-                    addDepartment();
-                    break;
-                case "Role":
-                    addRole();
-                    break;
-                case "Employee":
-                    addEmployee();
-                    break;  
-            }
-        })
-};
+
 
 function addDepartment() {
     inquirer.prompt([
@@ -104,7 +83,13 @@ function addDepartment() {
         })
 };
 
+
+
 function addRole() {
+    connection.query("SELECT id FROM department", (err, res) => {
+        if (err) throw err;
+        const departmentIdArray = res.map(({ id }) => `${id}`)
+    
     inquirer.prompt([
         {
             name: "title",
@@ -118,9 +103,19 @@ function addRole() {
         },
         {
             name: "department_id",
-            type: "number",
-            message: "What is the department ID number?"
-        }
+            type: "input",
+            message: "What is the department ID number?",
+            validate: function (departmentInput) {
+                var done = this.async();
+                setTimeout(function() {
+                  if (departmentIdArray.includes(departmentInput.toString()) === false) {
+                    done('not valid');
+                    return false;
+                  }
+                  done(null, true);
+                }, 10);
+              }
+            }
     ])
         .then(function (response) {
             console.table(response)
@@ -129,13 +124,14 @@ function addRole() {
                     title: response.title,
                     salary: response.salary,
                     department_id: response.department_id
-                },
-                
+                },  
             )
             console.log("Role added!")
             process.exit();
         })
+    });
 };
+
 
 function addEmployee() {
     inquirer.prompt([
@@ -181,6 +177,29 @@ function addEmployee() {
         })
 };
 
+function add() {
+    inquirer.prompt([
+        {
+            name: "departmentRoleEmployee",
+            type: "list",
+            message: "What would you like to add?",
+            choices: ["Employee", "Role", "Department"]
+        }])
+        .then((response) => {
+            switch (response.departmentRoleEmployee) {
+                case "Department":
+                    addDepartment();
+                    break;
+                case "Role":
+                    addRole();
+                    break;
+                case "Employee":
+                    addEmployee();
+                    break;  
+            }
+        })
+};
+
 //connect to mysql database
 connection.connect(err => {
     if (err) throw err;
@@ -212,10 +231,10 @@ function init() {
 };
 
 function updateEmployeeRole() {
-    connection.query("SELECT id, first_name, last_name from employee", (err, employeeRes) => {
+    connection.query("SELECT id, first_name, last_name FROM employee", (err, employeeRes) => {
         if (err) throw err;
         const formattedEmployeeData = employeeRes.map(({ id, first_name, last_name }) => `${id}: ${first_name} ${last_name}`)
-        connection.query("SELECT id, title from role", (err, roleRes) => {
+        connection.query("SELECT id, title FROM role", (err, roleRes) => {
             if (err) throw err;
             const formattedRoleData = roleRes.map(({ id, title }) => `${id}: ${title}`);
             inquirer.prompt([
