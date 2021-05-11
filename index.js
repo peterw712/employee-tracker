@@ -12,6 +12,7 @@ const connection = mysql.createConnection({
     database: "tracker_db"
 });
 
+//display employee table
 function employee() {
     let query = "SELECT * FROM employee"
     connection.query(query, (err, res) => {
@@ -19,7 +20,7 @@ function employee() {
         init();
     })  
 };
-
+//display department table
 function department() {
     let query = "SELECT * FROM department"
     connection.query(query, (err, res) => {
@@ -27,7 +28,7 @@ function department() {
         init();
     })  
 };
-
+//display role table
 function role() {
     let query = "SELECT * FROM role"
     connection.query(query, (err, res) => {
@@ -35,7 +36,7 @@ function role() {
         init();
     })
 };
-
+//view options
 function view() {
     inquirer.prompt([
         {
@@ -84,7 +85,9 @@ function addDepartment() {
         })
 };
 
+//add functions
 function addRole() {
+    //connection for validation
     connection.query("SELECT id FROM department", (err, res) => {
         if (err) throw err;
         const departmentIdArray = res.map(({ id }) => `${id}`)
@@ -130,7 +133,6 @@ function addRole() {
         })
     });
 };
-
 
 function addEmployee() {
     // connection.query("SELECT id FROM role", (err, res) => {
@@ -190,6 +192,7 @@ function addEmployee() {
         })
 };
 
+//add options
 function add() {
     inquirer.prompt([
         {
@@ -230,7 +233,7 @@ function updateEmployeeRole() {
                 {
                     type: "list",
                     choices: formattedEmployeeData,
-                    name: "targetEmp",
+                    name: "targetEmployee",
                     message: "Whose role needs to change?"
                 }, {
                     type: "list",
@@ -238,10 +241,10 @@ function updateEmployeeRole() {
                     name: "targetRole",
                     message: "What is their new role?"
                 }
-            ]).then(({ targetEmp, targetRole }) => {
-                let id = targetEmp.split(":")[0]; 
+            ]).then(({ targetEmployee, targetRole }) => {
+                let id = targetEmployee.split(":")[0]; 
                 let role_ID = targetRole.split(":")[0];
-                connection.query("UPDATE employee SET role_ID = ? WHERE id = ?", [role_ID, id], (err, success) => {
+                connection.query("UPDATE employee SET role_ID = ? WHERE id = ?", [role_ID, id], (err, res) => {
                     if (err) throw err;
                     console.log(`Employee role updated!`);
                     process.exit();
@@ -255,6 +258,7 @@ function updateEmployeeRole() {
 
 //start menu
 function init() {
+    console.log('Welcome to Employee Tracker!')
     inquirer.prompt([
         {
             name: "viewAddUpdate",
