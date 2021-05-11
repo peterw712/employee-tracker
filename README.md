@@ -13,3 +13,4 @@ In npm, download mysql, console.table, and inquirer. Use your mysql password to 
 
 ## Usage
 
+![demo]https://drive.google.com/file/d/1sK86hXVA7c7sQXyVjCVry0lxFTsRQXUy/view
