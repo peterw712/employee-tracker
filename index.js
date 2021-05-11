@@ -1,11 +1,14 @@
+const dotenv = require('dotenv');
 const mysql = require("mysql2");
 const inquirer = require("inquirer");
+
+dotenv.config({ path: './.env'});
 
 const connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
     user: "root",
-    password: "68yarecirPotS04",
+    password: process.env.PASSWORD,
     database: "tracker_db"
 });
 
@@ -55,8 +58,6 @@ function view() {
         })
 };
 
-
-
 function addDepartment() {
     inquirer.prompt([
         {
@@ -83,8 +84,6 @@ function addDepartment() {
         })
 };
 
-
-
 function addRole() {
     connection.query("SELECT id FROM department", (err, res) => {
         if (err) throw err;
@@ -107,9 +106,9 @@ function addRole() {
             message: "What is the department ID number?",
             validate: function (departmentInput) {
                 var done = this.async();
-                setTimeout(function() {
-                  if (departmentIdArray.includes(departmentInput.toString()) === false) {
-                    done('not valid');
+                setTimeout(() => {
+                  if (!departmentIdArray.includes(departmentInput.toString())) {
+                    done(`${departmentInput} is not a valid department ID`);
                     return false;
                   }
                   done(null, true);
@@ -134,6 +133,9 @@ function addRole() {
 
 
 function addEmployee() {
+    // connection.query("SELECT id FROM role", (err, res) => {
+    //     if (err) throw err;
+    //     const roleIdArray = res.map(({ id }) => `${id}`)
     inquirer.prompt([
         {
             name: "first_name",
@@ -148,7 +150,18 @@ function addEmployee() {
         {
             name: "role_id",
             type: "input",
-            message: "What is the employee's role ID number?"
+            message: "What is the employee's role ID number?",
+            // validate: function (roleInput) {
+            //     var done = this.async();
+            //     setTimeout(() => {
+            //       if (!roleIdArray.includes(roleInput.toString())) {
+            //         done(`${roleInput} is not a valid role ID`);
+            //         return false;
+            //       }
+            //       done(null, true);
+            //     }, 10);
+            //   }
+            // }
         },
         {
             name: "manager_id",
@@ -206,30 +219,6 @@ connection.connect(err => {
     init();
 });
 
-//start menu
-function init() {
-    inquirer.prompt([
-        {
-            name: "viewAddUpdate",
-            type: "list",
-            message: "What would you like to do?",
-            choices: ["View", "Add", "Update Employee Role"]
-        }])
-        .then(function (response) {
-            switch (response.viewAddUpdate) {
-                case "View":
-                    view();
-                    break;
-                case "Add":
-                    add();
-                    break;
-                case "Update Employee Role":
-                    updateEmployeeRole();
-                    break;
-            }
-        })
-};
-
 function updateEmployeeRole() {
     connection.query("SELECT id, first_name, last_name FROM employee", (err, employeeRes) => {
         if (err) throw err;
@@ -262,6 +251,32 @@ function updateEmployeeRole() {
         })
     })
 };
+
+
+//start menu
+function init() {
+    inquirer.prompt([
+        {
+            name: "viewAddUpdate",
+            type: "list",
+            message: "What would you like to do?",
+            choices: ["View", "Add", "Update Employee Role"]
+        }])
+        .then(function (response) {
+            switch (response.viewAddUpdate) {
+                case "View":
+                    view();
+                    break;
+                case "Add":
+                    add();
+                    break;
+                case "Update Employee Role":
+                    updateEmployeeRole();
+                    break;
+            }
+        })
+};
+
 
 
 
